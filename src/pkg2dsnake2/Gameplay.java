@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -85,6 +86,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             snakeylength[0] = 200;
         }
         
+        int int_score = Login.db_query();
+        
+        // Create leader board or Dash board
+        
         // draw the image border
         g.setColor(Color.WHITE);
         g.drawRect(24, 10, 851, 55);
@@ -103,13 +108,34 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         
         // draw the score
         g.setColor(Color.WHITE);
-        g.setFont(new Font("arial", Font.PLAIN, 14));
+        g.setFont(new Font("montserrat bold", Font.PLAIN, 14));
         g.drawString("Scores: "+score, 780, 30);
         
-        // draw the lengthofsnake
+        // draw the username
+        String user = Login.get_user();
         g.setColor(Color.WHITE);
-        g.setFont(new Font("arial", Font.PLAIN, 14));
-        g.drawString("Length: "+lengthofsnake, 780, 50);
+        g.setFont(new Font("montserrat", Font.PLAIN, 16));
+        g.drawString("Welcome, "+user, 50, 35);
+        
+        // draw the high_score
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("montserrat bold", Font.PLAIN, 14));
+        g.drawString("High Score: "+int_score, 50, 55);
+        
+        // draw the lengthofsnake
+        if(lengthofsnake < 40){
+            
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("montserrat bold", Font.PLAIN, 14));
+            g.drawString("Length: "+lengthofsnake, 780, 50);
+            
+        }else if(lengthofsnake >= 40){
+            
+            g.setColor(Color.RED);
+            g.setFont(new Font("montserrat bold", Font.PLAIN, 14));
+            g.drawString("Length: "+lengthofsnake, 780, 50);
+            
+        }
         
         rightmouth = new ImageIcon("rightmouth.png");
         rightmouth.paintIcon(this, g, snakexlength[0], snakeylength[0]);
@@ -155,6 +181,13 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         
         enemyimage.paintIcon(this, g, enemyxpos[xpos], enemyypos[ypos]);
         
+        
+        if(score > int_score){
+            g.setColor(Color.GREEN);
+            g.setFont(new Font("montserrat bold", Font.PLAIN, 14));
+            g.drawString("New High Score: "+score, 620, 30);
+        }
+        
         for(int b = 1; b<lengthofsnake; b++) {
             if(snakexlength[b] == snakexlength[0] && snakeylength[b] == snakeylength[0]) {
                 right = false;
@@ -163,15 +196,30 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 up = false;
 
                 g.setColor(Color.YELLOW);
-                g.setFont(new Font("arial", Font.PLAIN, 50));
+                g.setFont(new Font("comic sans ms", Font.PLAIN, 50));
                 g.drawString("GAME OVER", 300, 300);
 
-                g.setFont(new Font("arial", Font.PLAIN, 24));
-                g.drawString("Space to RESTART", 300, 350);
+                g.setFont(new Font("comic sans ms", Font.PLAIN, 24));
+                g.drawString("Space to RESTART", 340, 350);
+    
+                try{
+                    
                 
-                startMenu obj = new startMenu();
-                obj.setVisible(true);
-                g.dispose();
+                    if(score >= int_score){
+
+                        int new_high_score = score;
+
+                        Login.db_update(new_high_score);
+
+                    }
+                    
+                }catch(Exception e){
+                    
+                    JOptionPane.showMessageDialog(null, e);
+                    
+                }
+                
+                
            }
         }
         
